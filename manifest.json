@@ -1,6 +1,6 @@
 {
-  "name": "Escuela Pádel Mascareta",
-  "short_name": "Escuela Pádel Mascareta",
+  "name": "Pádel Mascareta",
+  "short_name": "Pádel Mascareta",
   "description": "Gestión de alumnos, grupos, ejercicios y clases de pádel",
   "start_url": "./index.html",
   "display": "standalone",

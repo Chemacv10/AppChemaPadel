@@ -1,6 +1,6 @@
 {
-  "name": "Pádel Mascareta",
-  "short_name": "Pádel Mascareta",
+  "name": "Chema Pádel",
+  "short_name": "Chema Pádel",
   "description": "Gestión de alumnos, grupos, ejercicios y clases de pádel",
   "start_url": "./index.html",
   "display": "standalone",

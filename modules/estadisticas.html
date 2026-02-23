@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estadísticas – Chema Pádel</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    /* ══ ESTILOS ESTADÍSTICAS ═════════════════════════════════ */
+
+    /* Tabs sección */
+    .stat-tabs {
+      display: flex; gap: 0;
+      background: var(--blanco);
+      border-radius: var(--radio-sm);
+      padding: 4px;
+      box-shadow: var(--sombra-sm);
+      margin-bottom: 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .stat-tabs::-webkit-scrollbar { display: none; }
+    .stat-tab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border: none; background: none;
+      font-family: inherit; font-size: 0.8rem; font-weight: 700;
+      color: var(--gris-3); border-radius: 6px; cursor: pointer;
+      transition: all var(--trans); white-space: nowrap;
+    }
+    .stat-tab.active { background: var(--negro); color: var(--verde); }
+
+    /* Filtro de rango */
+    .rango-bar {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .rango-chip {
+      padding: 5px 13px; border-radius: 20px;
+      border: 2px solid var(--gris-4);
+      background: var(--blanco);
+      font-family: inherit; font-size: 0.76rem; font-weight: 700;
+      color: var(--gris-2); cursor: pointer;
+      transition: all var(--trans);
+    }
+    .rango-chip.active {
+      background: var(--negro); border-color: var(--negro); color: var(--verde);
+    }
+
+    /* Bloques de estadística */
+    .stat-block {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .stat-block-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1rem; letter-spacing: 1.5px;
+      color: var(--negro);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* KPI grande */
+    .kpi-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 12px;
+    }
+    .kpi-item {
+      background: var(--gris-5);
+      border-radius: var(--radio-sm);
+      padding: 12px;
+      text-align: center;
+    }
+    .kpi-value {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 2rem; color: var(--verde);
+      line-height: 1;
+    }
+    .kpi-label {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--gris-3); margin-top: 3px;
+    }
+
+    /* Tabla de ranking */
+    .ranking-table { width: 100%; border-collapse: collapse; }
+    .ranking-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--gris-5);
+      font-size: 0.85rem;
+      vertical-align: middle;
+    }
+    .ranking-table tr:last-child td { border-bottom: none; }
+    .ranking-pos {
+      width: 28px; font-weight: 800;
+      color: var(--gris-3); text-align: center;
+    }
+    .ranking-name { font-weight: 600; flex: 1; }
+    .ranking-val {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 1.1rem; color: var(--verde);
+      text-align: right; min-width: 40px;
+    }
+    .ranking-sub { font-size: 0.72rem; color: var(--gris-3); }
+
+    /* Barra de porcentaje */
+    .pct-bar-wrap { margin: 6px 0; }
+    .pct-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--gris-2); margin-bottom: 4px;
+    }
+    .pct-bar-bg {
+      height: 8px; background: var(--gris-5);
+      border-radius: 4px; overflow: hidden;
+    }
+    .pct-bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Selector de alumno/grupo */
+    .selector-row {
+      display: flex; gap: 8px; margin-bottom: 14px;
+    }
+    .selector-row select {
+      flex: 1; padding: 10px 12px;
+      border: 2px solid var(--gris-4);
+      border-radius: var(--radio-sm);
+      font-family: inherit; font-size: 0.88rem;
+      background: var(--blanco); outline: none;
+      transition: border-color var(--trans);
+    }
+    .selector-row select:focus { border-color: var(--verde); }
+
+    /* Mini bar de historial mensual */
+    .month-bars {
+      display: flex; align-items: flex-end; gap: 4px;
+      height: 60px; margin: 8px 0;
+    }
+    .month-col {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+    }
+    .month-bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: var(--verde); min-height: 2px;
+      transition: height 0.3s ease;
+    }
+    .month-label { font-size: 0.62rem; color: var(--gris-3); font-weight: 600; }
+    .month-num   { font-size: 0.7rem; font-weight: 700; color: var(--negro); }
+
+    /* Tag sin datos */
+    .no-data {
+      text-align: center; color: var(--gris-3);
+      font-size: 0.85rem; padding: 20px 0;
+    }
+
+    /* Bloque dividido */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* Separador de sección */
+    .section-sep {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--gris-3); margin: 16px 0 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="../index.html" class="header-logo" style="text-decoration:none;">
+      <div>
+        <img src="../icons/logo.jpg" alt="Logo" style="height:38px;width:auto;object-fit:contain;border-radius:6px;" /><span class="logo-text">🎾 Chema Pádel</span>
+        <span class="logo-sub">📊 Estadísticas</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="history.back()">←</button>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+
+    <div class="section-header">
+      <h2 class="section-title">📊 Estadísticas</h2>
+    </div>
+
+    <!-- Tabs de sección -->
+    <div class="stat-tabs">
+      <button class="stat-tab active" onclick="setTab('general', this)">📈 General</button>
+      <button class="stat-tab" onclick="setTab('alumnos', this)">👥 Alumnos</button>
+      <button class="stat-tab" onclick="setTab('grupos', this)">👨‍👩‍👧‍👦 Grupos</button>
+      <button class="stat-tab" onclick="setTab('ejercicios', this)">🎾 Ejercicios</button>
+      <button class="stat-tab" onclick="setTab('clases', this)">📅 Clases</button>
+      <button class="stat-tab" onclick="setTab('torneos', this)">🏆 Torneos</button>
+    </div>
+
+    <!-- Filtro rango de fechas -->
+    <div class="rango-bar" id="rangoBar">
+      <button class="rango-chip" onclick="setRango('semana', this)">Semana</button>
+      <button class="rango-chip" onclick="setRango('mes', this)">Mes</button>
+      <button class="rango-chip" onclick="setRango('trimestre', this)">Trimestre</button>
+      <button class="rango-chip" onclick="setRango('anio', this)">Año</button>
+      <button class="rango-chip active" onclick="setRango('todo', this)">Todo</button>
+    </div>
+
+    <!-- Contenido dinámico -->
+    <div id="statContent"></div>
+
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="../index.html"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></a>
+    <a class="nav-item" href="alumnos.html"><span class="nav-icon">👥</span><span class="nav-label">Alumnos</span></a>
+    <a class="nav-item" href="grupos.html"><span class="nav-icon">👨‍👩‍👧‍👦</span><span class="nav-label">Grupos</span></a>
+    <a class="nav-item" href="ejercicios.html"><span class="nav-icon">🎾</span><span class="nav-label">Ejercicios</span></a>
+    <a class="nav-item" href="clases.html"><span class="nav-icon">📅</span><span class="nav-label">Clases</span></a>
+    <a class="nav-item" href="torneos.html"><span class="nav-icon">🏆</span><span class="nav-label">Torneos</span></a>
+    <a class="nav-item active" href="estadisticas.html"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></a>
+  </nav>
+
+  <script src="../data/store.js"></script>
+  <script src="estadisticas.js"></script>
+</body>
+</html>

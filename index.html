@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎾 Chema Pádel</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f1923" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Chema Pádel" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.ico" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <div class="header-logo">
+      <div>
+        <img src="icons/logo.jpg" alt="Logo" style="height:38px;width:auto;object-fit:contain;border-radius:6px;" /><span class="logo-text">🎾 Chema Pádel</span>
+        <span class="logo-sub">Panel de gestión</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" title="Exportar datos" onclick="exportarDatos()" id="btnExportar">💾</button>
+      <label class="btn-icon" title="Importar datos" style="cursor:pointer;">
+        📂
+        <input type="file" accept=".json" style="display:none" onchange="onImportar(event)" />
+      </label>
+    </div>
+  </header>
+
+  <!-- ── Contenido principal ── -->
+  <main class="page-wrapper">
+
+    <div class="section-header">
+      <h2 class="section-title">🏠 Dashboard</h2>
+    </div>
+
+    <!-- Tarjetas de resumen rápido -->
+    <div class="stats-grid" id="statsGrid">
+      <a href="modules/alumnos.html" class="stat-card">
+        <span class="stat-icon">👥</span>
+        <span class="stat-value" id="numAlumnos">0</span>
+        <span class="stat-label">Alumnos</span>
+      </a>
+      <a href="modules/grupos.html" class="stat-card">
+        <span class="stat-icon">👨‍👩‍👧‍👦</span>
+        <span class="stat-value" id="numGrupos">0</span>
+        <span class="stat-label">Grupos</span>
+      </a>
+      <a href="modules/alumnos.html" class="stat-card" style="opacity:.45;pointer-events:none;">
+        <span class="stat-icon">📅</span>
+        <span class="stat-value">—</span>
+        <span class="stat-label">Clases (pronto)</span>
+      </a>
+      <a href="modules/torneos.html" class="stat-card">
+        <span class="stat-icon">🏆</span>
+        <span class="stat-value" id="numTorneos">0</span>
+        <span class="stat-label">Torneos</span>
+      </a>
+    </div>
+
+    <!-- Accesos rápidos -->
+    <div class="section-header" style="margin-top:8px;">
+      <h2 class="section-title" style="font-size:1.1rem;">Accesos rápidos</h2>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;" id="accessList">
+      <!-- Se rellena con JS -->
+    </div>
+
+  </main>
+
+  <!-- ── Bottom Navigation ── -->
+  <nav class="bottom-nav">
+    <a class="nav-item active" href="index.html"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></a>
+    <a class="nav-item" href="modules/alumnos.html"><span class="nav-icon">👥</span><span class="nav-label">Alumnos</span></a>
+    <a class="nav-item" href="modules/grupos.html"><span class="nav-icon">👨‍👩‍👧‍👦</span><span class="nav-label">Grupos</span></a>
+    <a class="nav-item" href="modules/ejercicios.html"><span class="nav-icon">🎾</span><span class="nav-label">Ejercicios</span></a>
+    <a class="nav-item" href="modules/clases.html"><span class="nav-icon">📅</span><span class="nav-label">Clases</span></a>
+    <a class="nav-item" href="modules/torneos.html"><span class="nav-icon">🏆</span><span class="nav-label">Torneos</span></a>
+    <a class="nav-item" href="modules/estadisticas.html"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></a>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="data/store.js"></script>
+  <script>
+    // ── Cargar datos del dashboard ────────────────────────────
+    function renderDashboard() {
+      const db = loadDB();
+      document.getElementById('numAlumnos').textContent = db.alumnos.length;
+      const ejEl = document.getElementById('numEjercicios');
+      const clEl = document.getElementById('numClases');
+      if (clEl) clEl.textContent = (db.clases || []).length;
+      const torEl = document.getElementById('numTorneos');
+      if (torEl) torEl.textContent = (db.torneos || []).length;
+      if (ejEl) ejEl.textContent = (db.ejercicios || []).length;
+      document.getElementById('numGrupos').textContent  = db.grupos.length;
+
+      // Accesos rápidos con últimos alumnos/grupos
+      const accessList = document.getElementById('accessList');
+
+      let html = '';
+
+      // Últimos 3 grupos activos
+      if (db.grupos.length > 0) {
+        const grupos = [...db.grupos].reverse().slice(0, 3);
+        grupos.forEach(g => {
+          const nAlumnos = g.alumnos.length;
+          html += `
+            <a href="modules/grupos.html" class="stat-card" style="flex-direction:row;align-items:center;gap:12px;padding:14px 16px;">
+              <span style="font-size:1.6rem;">👨‍👩‍👧‍👦</span>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:.92rem;">${escHtml(g.nombre)}</div>
+                <div style="font-size:.75rem;color:var(--gris-3);">${g.nivel} · Pista ${g.pista} · ${nAlumnos} alumno${nAlumnos !== 1 ? 's' : ''}</div>
+              </div>
+              <span style="color:var(--gris-4);font-size:.9rem;">›</span>
+            </a>`;
+        });
+      } else {
+        html = `<div class="empty-state" style="padding:32px;">
+          <div class="empty-icon">🎾</div>
+          <p>¡Bienvenido a Chema Pádel!<br>Empieza creando tus grupos y alumnos.</p>
+          <a href="modules/grupos.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex;">Crear primer grupo</a>
+        </div>`;
+      }
+
+      accessList.innerHTML = html;
+    }
+
+    // ── Importar datos ────────────────────────────────────────
+    function onImportar(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        if (importarDatos(ev.target.result)) {
+          showToast('✅ Datos importados correctamente', 'toast-success');
+          renderDashboard();
+        } else {
+          showToast('❌ Error al importar el archivo', 'toast-error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    // ── Toast ─────────────────────────────────────────────────
+    const toastEl = document.getElementById('toast');
+    let toastT;
+    function showToast(msg, tipo = 'toast-success') {
+      clearTimeout(toastT);
+      toastEl.textContent = msg;
+      toastEl.className = `show ${tipo}`;
+      toastT = setTimeout(() => { toastEl.className = ''; }, 2800);
+    }
+
+    renderDashboard();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumnos – Chema Pádel</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a href="../index.html" class="header-logo" style="text-decoration:none;">
+      <div>
+        <img src="../icons/logo.jpg" alt="Logo" style="height:38px;width:auto;object-fit:contain;border-radius:6px;" /><span class="logo-text">🎾 Chema Pádel</span>
+        <span class="logo-sub">👥 Alumnos</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="history.back()" title="Volver">←</button>
+    </div>
+  </header>
+
+  <!-- ── Contenido ── -->
+  <main class="page-wrapper">
+
+    <div class="section-header">
+      <h2 class="section-title">👥 Alumnos</h2>
+      <span class="section-count" id="sectionCount">0 alumnos</span>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre o grupo…" oninput="renderLista()" />
+    </div>
+
+    <!-- Lista -->
+    <div class="items-list" id="listaAlumnos"></div>
+
+  </main>
+
+  <!-- ── FAB: añadir alumno ── -->
+  <button class="fab" onclick="abrirModal()" title="Añadir alumno">＋</button>
+
+  <!-- ── Bottom Navigation ── -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="../index.html"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></a>
+    <a class="nav-item active" href="alumnos.html"><span class="nav-icon">👥</span><span class="nav-label">Alumnos</span></a>
+    <a class="nav-item" href="grupos.html"><span class="nav-icon">👨‍👩‍👧‍👦</span><span class="nav-label">Grupos</span></a>
+    <a class="nav-item" href="ejercicios.html"><span class="nav-icon">🎾</span><span class="nav-label">Ejercicios</span></a>
+    <a class="nav-item" href="clases.html"><span class="nav-icon">📅</span><span class="nav-label">Clases</span></a>
+    <a class="nav-item" href="torneos.html"><span class="nav-icon">🏆</span><span class="nav-label">Torneos</span></a>
+    <a class="nav-item" href="estadisticas.html"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></a>
+  </nav>
+
+  <!-- ── Modal: Añadir / Editar alumno ── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="cerrarModalOverlay(event)">
+    <div class="modal-sheet" id="modalSheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="modalTitle">Nuevo Alumno</h3>
+
+      <div class="form-group">
+        <label>Nombre completo *</label>
+        <input type="text" id="fNombre" placeholder="Ej: María García" autocomplete="off" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nivel *</label>
+          <select id="fNivel">
+            <option value="Principiante">Principiante</option>
+            <option value="Intermedio">Intermedio</option>
+            <option value="Avanzado">Avanzado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Grupo</label>
+          <select id="fGrupo">
+            <option value="">Sin grupo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" id="fTelefono" placeholder="Ej: 600 123 456" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="fEmail" placeholder="email@ejemplo.com" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha de nacimiento</label>
+          <input type="date" id="fFechaNac" />
+        </div>
+        <div class="form-group">
+          <label>Avatar</label>
+          <select id="fAvatar">
+            <option value="">Iniciales (auto)</option>
+            <option value="🎾">🎾 Raqueta</option>
+            <option value="⭐">⭐ Estrella</option>
+            <option value="🔥">🔥 Fuego</option>
+            <option value="💪">💪 Fuerza</option>
+            <option value="🏆">🏆 Trofeo</option>
+            <option value="🦁">🦁 León</option>
+            <option value="🐯">🐯 Tigre</option>
+            <option value="🦊">🦊 Zorro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" id="btnGuardar" onclick="guardarAlumno()">Guardar alumno</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="../data/store.js"></script>
+  <script src="alumnos.js"></script>
+
+</body>
+</html>

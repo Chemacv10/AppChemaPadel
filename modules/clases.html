@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clases – Chema Pádel</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    /* ── Estilos módulo Clases ── */
+
+    /* Tabs vista lista/historial */
+    .tabs {
+      display: flex;
+      gap: 0;
+      background: var(--blanco);
+      border-radius: var(--radio-sm);
+      padding: 4px;
+      box-shadow: var(--sombra-sm);
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      background: none;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--gris-3);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--trans);
+    }
+    .tab-btn.active {
+      background: var(--negro);
+      color: var(--verde);
+    }
+
+    /* Filtros clase */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .filter-row select {
+      flex: 1;
+      min-width: 120px;
+      padding: 8px 10px;
+      border: 2px solid var(--gris-4);
+      border-radius: var(--radio-sm);
+      font-family: inherit;
+      font-size: 0.82rem;
+      background: var(--blanco);
+      color: var(--negro);
+      outline: none;
+    }
+
+    /* Card clase en lista */
+    .clase-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra-sm);
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: border-color var(--trans);
+      animation: fadeUp 0.2s ease both;
+      margin-bottom: 8px;
+    }
+    .clase-card.expanded { border-color: var(--verde); box-shadow: var(--sombra); }
+
+    .clase-compact {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      cursor: pointer;
+    }
+
+    .estado-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-realizada  { background: var(--verde); }
+    .dot-suspendida { background: var(--rojo); }
+    .dot-festivo    { background: var(--amarillo); }
+
+    .clase-expanded {
+      display: none;
+      padding: 0 14px 16px;
+      border-top: 1px solid var(--gris-5);
+    }
+    .clase-card.expanded .clase-expanded { display: block; }
+
+    /* Bloques dentro de la clase */
+    .bloque-list { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+
+    .bloque-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gris-5);
+      border-radius: var(--radio-sm);
+      padding: 9px 12px;
+      font-size: 0.85rem;
+    }
+    .bloque-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .bloque-info { flex: 1; min-width: 0; }
+    .bloque-nombre { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bloque-meta { font-size: 0.72rem; color: var(--gris-3); margin-top: 1px; }
+    .bloque-no-realizado { opacity: 0.5; text-decoration: line-through; }
+
+    /* Asistencia chips */
+    .asistencia-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+    .asist-chip {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .asist-vino    { background: var(--verde-light); color: var(--verde-dark); }
+    .asist-no-vino { background: var(--gris-5); color: var(--gris-3); }
+
+    /* ── MODAL NUEVA CLASE ── */
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; }
+
+    .wizard-progress {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .wp-dot {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--gris-4);
+      transition: background 0.3s;
+    }
+    .wp-dot.done { background: var(--verde); }
+
+    /* Checklist asistencia */
+    .check-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radio-sm);
+      border: 2px solid var(--gris-4);
+      cursor: pointer;
+      transition: all var(--trans);
+      user-select: none;
+    }
+    .check-item.checked {
+      border-color: var(--verde);
+      background: var(--verde-light);
+    }
+    .check-box {
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      border: 2px solid var(--gris-4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      transition: all var(--trans);
+    }
+    .check-item.checked .check-box {
+      background: var(--verde);
+      border-color: var(--verde);
+      color: var(--blanco);
+    }
+    .check-nombre { font-weight: 600; font-size: 0.9rem; flex: 1; }
+    .check-nivel  { font-size: 0.72rem; color: var(--gris-3); }
+
+    /* Sugerencia bloques */
+    .sugerencia-box {
+      background: var(--gris-5);
+      border-radius: var(--radio);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .sug-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--gris-3);
+      margin-bottom: 12px;
+    }
+    .sug-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .sug-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sug-counter {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 2px solid var(--gris-4);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .sug-counter button {
+      width: 30px; height: 30px;
+      border: none;
+      background: var(--blanco);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--negro);
+      transition: background var(--trans);
+    }
+    .sug-counter button:hover { background: var(--gris-5); }
+    .sug-counter span {
+      width: 28px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-left: 1px solid var(--gris-4);
+      border-right: 1px solid var(--gris-4);
+      padding: 4px 0;
+    }
+
+    .modo-btns {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .modo-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: var(--radio-sm);
+      border: 2px solid var(--gris-4);
+      background: var(--blanco);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--gris-2);
+      transition: all var(--trans);
+      text-align: center;
+    }
+    .modo-btn.active {
+      border-color: var(--negro);
+      background: var(--negro);
+      color: var(--verde);
+    }
+
+    /* Bloques editables (en modal) */
+    .bloque-editor { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+
+    .bloque-edit-item {
+      background: var(--blanco);
+      border: 2px solid var(--gris-4);
+      border-radius: var(--radio-sm);
+      padding: 10px 12px;
+    }
+    .bloque-edit-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .bloque-edit-header strong { flex: 1; font-size: 0.88rem; }
+
+    .bloque-edit-item select,
+    .bloque-edit-item input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--gris-4);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      background: var(--gris-5);
+      margin-top: 5px;
+      outline: none;
+    }
+
+    .bloque-edit-item input:focus,
+    .bloque-edit-item select:focus { border-color: var(--verde); background: var(--blanco); }
+
+    .add-bloque-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .add-bloque-btn {
+      padding: 7px 13px;
+      border-radius: 20px;
+      border: 2px solid var(--gris-4);
+      background: var(--blanco);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--trans);
+    }
+    .add-bloque-btn:hover {
+      border-color: var(--negro);
+      background: var(--negro);
+      color: var(--verde);
+    }
+
+    .wizard-nav {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      position: sticky;
+      bottom: 0;
+      background: var(--blanco);
+      padding: 12px 0 4px;
+    }
+
+    .badge-estado {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .badge-realizada  { background: var(--verde-light); color: var(--verde-dark); }
+    .badge-suspendida { background: var(--rojo-light); color: var(--rojo); }
+    .badge-festivo    { background: var(--amarillo-l); color: #7a4f00; }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <a href="../index.html" class="header-logo" style="text-decoration:none;">
+      <div>
+        <img src="../icons/logo.jpg" alt="Logo" style="height:38px;width:auto;object-fit:contain;border-radius:6px;" /><span class="logo-text">🎾 Chema Pádel</span>
+        <span class="logo-sub">📅 Clases</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="history.back()" title="Volver">←</button>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+
+    <div class="section-header">
+      <h2 class="section-title">📅 Clases</h2>
+      <span class="section-count" id="sectionCount">0 clases</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="setTab('lista', this)">📋 Lista</button>
+      <button class="tab-btn" onclick="setTab('historial', this)">📊 Historial</button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-row">
+      <select id="filtroGrupo" onchange="renderLista()">
+        <option value="">Todos los grupos</option>
+      </select>
+      <select id="filtroEstado" onchange="renderLista()">
+        <option value="">Todos los estados</option>
+        <option value="Realizada">✅ Realizadas</option>
+        <option value="Suspendida">❌ Suspendidas</option>
+        <option value="Festivo">🎉 Festivos</option>
+      </select>
+    </div>
+
+    <!-- Lista clases -->
+    <div id="vistaLista">
+      <div id="listaClases"></div>
+    </div>
+
+    <!-- Historial (resumen) -->
+    <div id="vistaHistorial" style="display:none;">
+      <div id="contenidoHistorial"></div>
+    </div>
+
+  </main>
+
+  <!-- FAB -->
+  <button class="fab" onclick="abrirWizard()" title="Nueva clase">＋</button>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="../index.html"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></a>
+    <a class="nav-item" href="alumnos.html"><span class="nav-icon">👥</span><span class="nav-label">Alumnos</span></a>
+    <a class="nav-item" href="grupos.html"><span class="nav-icon">👨‍👩‍👧‍👦</span><span class="nav-label">Grupos</span></a>
+    <a class="nav-item" href="ejercicios.html"><span class="nav-icon">🎾</span><span class="nav-label">Ejercicios</span></a>
+    <a class="nav-item active" href="clases.html"><span class="nav-icon">📅</span><span class="nav-label">Clases</span></a>
+    <a class="nav-item" href="torneos.html"><span class="nav-icon">🏆</span><span class="nav-label">Torneos</span></a>
+    <a class="nav-item" href="estadisticas.html"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></a>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       MODAL WIZARD – NUEVA / EDITAR CLASE
+  ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalOverlay" onclick="cerrarModalOverlay(event)">
+    <div class="modal-sheet" id="modalSheet" style="max-height:92vh;">
+      <div class="modal-handle"></div>
+
+      <!-- Progreso -->
+      <div class="wizard-progress" id="wizardProgress">
+        <div class="wp-dot done" id="wp1"></div>
+        <div class="wp-dot" id="wp2"></div>
+        <div class="wp-dot" id="wp3"></div>
+        <div class="wp-dot" id="wp4"></div>
+      </div>
+
+      <h3 class="modal-title" id="modalTitle">Nueva Clase</h3>
+
+      <!-- ── PASO 1: Datos básicos ── -->
+      <div class="wizard-step active" id="step1">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha *</label>
+            <input type="date" id="fFecha" />
+          </div>
+          <div class="form-group">
+            <label>Hora</label>
+            <input type="time" id="fHora" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Grupo *</label>
+            <select id="fGrupo" onchange="onGrupoChange()">
+              <option value="">Selecciona grupo…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Duración</label>
+            <select id="fDuracion">
+              <option value="">—</option>
+              <option value="30 min">30 min</option>
+              <option value="45 min">45 min</option>
+              <option value="60 min">60 min</option>
+              <option value="75 min">75 min</option>
+              <option value="90 min">90 min</option>
+              <option value="120 min">120 min</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="fEstado" onchange="onEstadoChange()">
+            <option value="Realizada">✅ Realizada</option>
+            <option value="Suspendida">❌ Suspendida</option>
+            <option value="Festivo">🎉 Festivo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Observaciones</label>
+          <textarea id="fObs" rows="2" placeholder="Notas sobre la clase…" style="resize:vertical"></textarea>
+        </div>
+      </div>
+
+      <!-- ── PASO 2: Asistencia ── -->
+      <div class="wizard-step" id="step2">
+        <p style="font-size:.85rem;color:var(--gris-3);margin-bottom:10px;">Marca los alumnos que vinieron a clase:</p>
+        <div id="btnMarcarTodos" style="margin-bottom:8px;display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="marcarTodos(true)">✅ Todos</button>
+          <button class="btn btn-secondary btn-sm" onclick="marcarTodos(false)">☐ Ninguno</button>
+        </div>
+        <div class="check-list" id="checkAsistencia"></div>
+        <p id="sinAlumnos" style="display:none;font-size:.85rem;color:var(--gris-3);padding:16px 0;">
+          Este grupo no tiene alumnos asignados aún.
+        </p>
+      </div>
+
+      <!-- ── PASO 3: Sugerencia de bloques ── -->
+      <div class="wizard-step" id="step3">
+        <div class="modo-btns">
+          <button class="modo-btn active" id="btnSimple" onclick="setModo('simple')">⚡ Simple</button>
+          <button class="modo-btn" id="btnInteligente" onclick="setModo('inteligente')">🤖 Inteligente</button>
+        </div>
+
+        <div class="sugerencia-box">
+          <div class="sug-title">Estructura sugerida — ajusta las cantidades:</div>
+          <div class="sug-row">
+            <span class="sug-label">🏃 Calentamiento</span>
+            <div class="sug-counter">
+              <button onclick="cambiarCantidad('Calentamiento',-1)">−</button>
+              <span id="cnt-Calentamiento">1</span>
+              <button onclick="cambiarCantidad('Calentamiento',1)">+</button>
+            </div>
+          </div>
+          <div class="sug-row">
+            <span class="sug-label">🎯 Carritos</span>
+            <div class="sug-counter">
+              <button onclick="cambiarCantidad('Carritos',-1)">−</button>
+              <span id="cnt-Carritos">3</span>
+              <button onclick="cambiarCantidad('Carritos',1)">+</button>
+            </div>
+          </div>
+          <div class="sug-row">
+            <span class="sug-label">⚡ Situaciones</span>
+            <div class="sug-counter">
+              <button onclick="cambiarCantidad('Situaciones',-1)">−</button>
+              <span id="cnt-Situaciones">1</span>
+              <button onclick="cambiarCantidad('Situaciones',1)">+</button>
+            </div>
+          </div>
+          <div class="sug-row">
+            <span class="sug-label">🏆 Partiditos</span>
+            <div class="sug-counter">
+              <button onclick="cambiarCantidad('Partiditos',-1)">−</button>
+              <span id="cnt-Partiditos">1</span>
+              <button onclick="cambiarCantidad('Partiditos',1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" style="width:100%;margin-bottom:10px;" onclick="generarSugerencia()">
+          🔄 Generar otra sugerencia
+        </button>
+      </div>
+
+      <!-- ── PASO 4: Bloques detallados ── -->
+      <div class="wizard-step" id="step4">
+        <p style="font-size:.82rem;color:var(--gris-3);margin-bottom:10px;">
+          Revisa y ajusta los ejercicios de cada bloque:
+        </p>
+
+        <div class="bloque-editor" id="bloqueEditor"></div>
+
+        <div class="add-bloque-btns">
+          <button class="add-bloque-btn" onclick="addBloque('Calentamiento')">🏃 + Calentamiento</button>
+          <button class="add-bloque-btn" onclick="addBloque('Carritos')">🎯 + Carrito</button>
+          <button class="add-bloque-btn" onclick="addBloque('Situaciones')">⚡ + Situación</button>
+          <button class="add-bloque-btn" onclick="addBloque('Partiditos')">🏆 + Partidito</button>
+        </div>
+      </div>
+
+      <!-- Navegación wizard -->
+      <div class="wizard-nav">
+        <button class="btn btn-secondary" id="btnAnterior" onclick="pasoAnterior()" style="display:none;">← Atrás</button>
+        <button class="btn btn-primary" id="btnSiguiente" onclick="pasoSiguiente()">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="../data/store.js"></script>
+  <script src="clases.js"></script>
+</body>
+</html>

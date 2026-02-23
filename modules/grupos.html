@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grupos – Chema Pádel</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a href="../index.html" class="header-logo" style="text-decoration:none;">
+      <div>
+        <img src="../icons/logo.jpg" alt="Logo" style="height:38px;width:auto;object-fit:contain;border-radius:6px;" /><span class="logo-text">🎾 Chema Pádel</span>
+        <span class="logo-sub">👨‍👩‍👧‍👦 Grupos</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="history.back()" title="Volver">←</button>
+    </div>
+  </header>
+
+  <!-- ── Contenido ── -->
+  <main class="page-wrapper">
+
+    <div class="section-header">
+      <h2 class="section-title">👨‍👩‍👧‍👦 Grupos</h2>
+      <span class="section-count" id="sectionCount">0 grupos</span>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar por nombre o nivel…" oninput="renderLista()" />
+    </div>
+
+    <!-- Lista -->
+    <div class="items-list" id="listaGrupos"></div>
+
+  </main>
+
+  <!-- ── FAB: añadir grupo ── -->
+  <button class="fab" onclick="abrirModal()" title="Añadir grupo">＋</button>
+
+  <!-- ── Bottom Navigation ── -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="../index.html"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></a>
+    <a class="nav-item" href="alumnos.html"><span class="nav-icon">👥</span><span class="nav-label">Alumnos</span></a>
+    <a class="nav-item active" href="grupos.html"><span class="nav-icon">👨‍👩‍👧‍👦</span><span class="nav-label">Grupos</span></a>
+    <a class="nav-item" href="ejercicios.html"><span class="nav-icon">🎾</span><span class="nav-label">Ejercicios</span></a>
+    <a class="nav-item" href="clases.html"><span class="nav-icon">📅</span><span class="nav-label">Clases</span></a>
+    <a class="nav-item" href="torneos.html"><span class="nav-icon">🏆</span><span class="nav-label">Torneos</span></a>
+    <a class="nav-item" href="estadisticas.html"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></a>
+  </nav>
+
+  <!-- ── Modal: Añadir / Editar grupo ── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="cerrarModalOverlay(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="modalTitle">Nuevo Grupo</h3>
+
+      <div class="form-group">
+        <label>Nombre del grupo *</label>
+        <input type="text" id="fNombre" placeholder="Ej: Grupo Martes Mañana" autocomplete="off" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nivel *</label>
+          <select id="fNivel">
+            <option value="Principiante">Principiante</option>
+            <option value="Intermedio">Intermedio</option>
+            <option value="Avanzado">Avanzado</option>
+            <option value="Mixto">Mixto</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pista asignada</label>
+          <select id="fPista">
+            <option value="1">Pista 1</option>
+            <option value="2">Pista 2</option>
+            <option value="3">Pista 3</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" id="btnGuardar" onclick="guardarGrupo()">Guardar grupo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Confirmación eliminar grupo ── -->
+  <div class="confirm-modal" id="confirmModal">
+    <div class="confirm-box">
+      <div class="confirm-title" id="confirmTitle">⚠️ Eliminar grupo</div>
+      <div class="confirm-text" id="confirmText"></div>
+
+      <!-- Selector de grupo destino (si hay alumnos) -->
+      <select id="confirmSelectGrupo" class="confirm-select">
+        <option value="">Selecciona un grupo destino…</option>
+      </select>
+
+      <div class="confirm-btns" id="confirmBtns">
+        <!-- Se rellena dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="../data/store.js"></script>
+  <script src="grupos.js"></script>
+
+</body>
+</html>

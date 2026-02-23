@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ejercicios – Chema Pádel</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    /* ── Estilos específicos del módulo Ejercicios ── */
+
+    /* Barra de filtros */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 2px solid var(--gris-4);
+      background: var(--blanco);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gris-2);
+      cursor: pointer;
+      transition: all var(--trans);
+      white-space: nowrap;
+    }
+    .filter-chip.active {
+      background: var(--negro);
+      border-color: var(--negro);
+      color: var(--verde);
+    }
+    .filter-chip:hover:not(.active) {
+      border-color: var(--gris-2);
+      color: var(--negro);
+    }
+
+    /* Card ejercicio */
+    .ej-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra-sm);
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: border-color var(--trans), box-shadow var(--trans);
+      animation: fadeUp 0.2s ease both;
+    }
+    .ej-card.expanded {
+      border-color: var(--verde);
+      box-shadow: var(--sombra);
+    }
+
+    .ej-compact {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+
+    .cat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .ej-expanded {
+      display: none;
+      padding: 0 14px 16px;
+      border-top: 1px solid var(--gris-5);
+    }
+    .ej-card.expanded .ej-expanded { display: block; }
+
+    .ej-desc {
+      font-size: 0.87rem;
+      color: var(--gris-2);
+      line-height: 1.55;
+      padding: 12px 0 10px;
+      border-bottom: 1px solid var(--gris-5);
+    }
+
+    .ej-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 0 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--gris-5);
+      color: var(--gris-2);
+    }
+
+    .uso-date {
+      font-size: 0.72rem;
+      color: var(--gris-4);
+      padding: 4px 0 8px;
+    }
+
+    /* Categorías colores */
+    .cat-calentamiento  { background: #fff3e0; }
+    .cat-carritos       { background: #e3f2fd; }
+    .cat-situaciones    { background: #f3e5f5; }
+    .cat-partiditos     { background: #e8f5e9; }
+    .cat-otro           { background: var(--gris-5); }
+
+    /* Modal configuración (categorías / tipos / materiales) */
+    .config-section { margin-bottom: 20px; }
+    .config-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--gris-3);
+      margin-bottom: 10px;
+    }
+    .config-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+    .config-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--gris-5);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gris-2);
+    }
+    .config-chip button {
+      background: none;
+      border: none;
+      color: var(--rojo);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0;
+      line-height: 1;
+    }
+    .config-add-row {
+      display: flex;
+      gap: 8px;
+    }
+    .config-add-row input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid var(--gris-5);
+      border-radius: var(--radio-sm);
+      font-family: inherit;
+      font-size: 0.88rem;
+      outline: none;
+      background: var(--gris-5);
+    }
+    .config-add-row input:focus { border-color: var(--verde); background: var(--blanco); }
+    .config-add-row button {
+      padding: 8px 14px;
+      background: var(--negro);
+      color: var(--verde);
+      border: none;
+      border-radius: var(--radio-sm);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    /* Header acciones */
+    .module-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 2px solid var(--gris-4);
+      border-radius: var(--radio-sm);
+      background: var(--blanco);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gris-2);
+      cursor: pointer;
+      transition: all var(--trans);
+      white-space: nowrap;
+    }
+    .btn-outline:hover { border-color: var(--negro); color: var(--negro); }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="app-header">
+    <a href="../index.html" class="header-logo" style="text-decoration:none;">
+      <div>
+        <img src="../icons/logo.jpg" alt="Logo" style="height:38px;width:auto;object-fit:contain;border-radius:6px;" /><span class="logo-text">🎾 Chema Pádel</span>
+        <span class="logo-sub">🎾 Ejercicios</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="abrirConfigModal()" title="Configurar categorías y tipos">⚙️</button>
+      <button class="btn-icon" onclick="history.back()" title="Volver">←</button>
+    </div>
+  </header>
+
+  <!-- ── Contenido ── -->
+  <main class="page-wrapper">
+
+    <div class="section-header">
+      <h2 class="section-title">🎾 Ejercicios</h2>
+      <span class="section-count" id="sectionCount">0 ejercicios</span>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="module-actions">
+      <label class="btn-outline" style="cursor:pointer;">
+        📥 Importar JSON
+        <input type="file" accept=".json" style="display:none" onchange="importarEjercicios(event)" />
+      </label>
+      <button class="btn-outline" onclick="exportarEjercicios()">📤 Exportar</button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Buscar ejercicio…" oninput="renderLista()" />
+    </div>
+
+    <!-- Filtros: Categoría -->
+    <div class="filter-bar" id="filterCat">
+      <!-- Rellenado por JS -->
+    </div>
+
+    <!-- Filtros: Nivel -->
+    <div class="filter-bar" id="filterNivel">
+      <button class="filter-chip active" data-nivel="" onclick="setFiltroNivel(this, '')">Todos los niveles</button>
+      <button class="filter-chip" data-nivel="Principiante" onclick="setFiltroNivel(this, 'Principiante')">🟢 Principiante</button>
+      <button class="filter-chip" data-nivel="Intermedio" onclick="setFiltroNivel(this, 'Intermedio')">🟡 Intermedio</button>
+      <button class="filter-chip" data-nivel="Avanzado" onclick="setFiltroNivel(this, 'Avanzado')">🔴 Avanzado</button>
+    </div>
+
+    <!-- Lista ejercicios -->
+    <div class="items-list" id="listaEjercicios"></div>
+
+  </main>
+
+  <!-- ── FAB ── -->
+  <button class="fab" onclick="abrirModal()" title="Añadir ejercicio">＋</button>
+
+  <!-- ── Bottom Navigation ── -->
+  <nav class="bottom-nav">
+    <a class="nav-item" href="../index.html"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></a>
+    <a class="nav-item" href="alumnos.html"><span class="nav-icon">👥</span><span class="nav-label">Alumnos</span></a>
+    <a class="nav-item" href="grupos.html"><span class="nav-icon">👨‍👩‍👧‍👦</span><span class="nav-label">Grupos</span></a>
+    <a class="nav-item active" href="ejercicios.html"><span class="nav-icon">🎾</span><span class="nav-label">Ejercicios</span></a>
+    <a class="nav-item" href="clases.html"><span class="nav-icon">📅</span><span class="nav-label">Clases</span></a>
+    <a class="nav-item" href="torneos.html"><span class="nav-icon">🏆</span><span class="nav-label">Torneos</span></a>
+    <a class="nav-item" href="estadisticas.html"><span class="nav-icon">📊</span><span class="nav-label">Stats</span></a>
+  </nav>
+
+  <!-- ── Modal: Añadir / Editar ejercicio ── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="cerrarModalOverlay(event)">
+    <div class="modal-sheet" id="modalSheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="modalTitle">Nuevo Ejercicio</h3>
+
+      <div class="form-group">
+        <label>Nombre del ejercicio *</label>
+        <input type="text" id="fNombre" placeholder="Ej: Volea cruzada al centro" autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea id="fDesc" rows="3" placeholder="Describe el ejercicio, objetivos, variantes…" style="resize:vertical;"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Categoría *</label>
+          <select id="fCategoria"></select>
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="fTipo"></select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nivel</label>
+          <select id="fNivel">
+            <option value="Ninguno">Sin nivel</option>
+            <option value="Principiante">Principiante</option>
+            <option value="Intermedio">Intermedio</option>
+            <option value="Avanzado">Avanzado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Duración aprox.</label>
+          <select id="fDuracion">
+            <option value="">—</option>
+            <option value="5 min">5 min</option>
+            <option value="10 min">10 min</option>
+            <option value="15 min">15 min</option>
+            <option value="20 min">20 min</option>
+            <option value="25 min">25 min</option>
+            <option value="30 min">30 min</option>
+            <option value="45 min">45 min</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nº jugadores</label>
+          <select id="fJugadores">
+            <option value="">—</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="2-4">2-4</option>
+            <option value="4+">4+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Material</label>
+          <select id="fMaterial" multiple style="height:80px;border-radius:var(--radio-sm);border:2px solid var(--gris-5);padding:4px;font-family:inherit;font-size:0.85rem;background:var(--gris-5);outline:none;">
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>🎬 Video tutorial (YouTube)</label>
+        <input type="url" id="fVideoUrl" placeholder="https://youtube.com/watch?v=..." />
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" id="btnGuardar" onclick="guardarEjercicio()">Guardar ejercicio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Configuración (categorías / tipos / materiales) ── -->
+  <div class="modal-overlay" id="configOverlay" onclick="cerrarConfigOverlay(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title">⚙️ Configuración</h3>
+
+      <!-- Categorías -->
+      <div class="config-section">
+        <div class="config-title">Categorías</div>
+        <div class="config-chips" id="configCats"></div>
+        <div class="config-add-row">
+          <input type="text" id="newCat" placeholder="Nueva categoría…" />
+          <button onclick="añadirCategoria()">＋ Añadir</button>
+        </div>
+      </div>
+
+      <!-- Tipos -->
+      <div class="config-section">
+        <div class="config-title">Tipos de ejercicio</div>
+        <div class="config-chips" id="configTipos"></div>
+        <div class="config-add-row">
+          <input type="text" id="newTipo" placeholder="Nuevo tipo…" />
+          <button onclick="añadirTipo()">＋ Añadir</button>
+        </div>
+      </div>
+
+      <!-- Materiales -->
+      <div class="config-section">
+        <div class="config-title">Materiales</div>
+        <div class="config-chips" id="configMateriales"></div>
+        <div class="config-add-row">
+          <input type="text" id="newMaterial" placeholder="Nuevo material…" />
+          <button onclick="añadirMaterial()">＋ Añadir</button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="cerrarConfigModal()">Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script src="../data/store.js"></script>
+  <script src="ejercicios.js"></script>
+
+</body>
+</html>
